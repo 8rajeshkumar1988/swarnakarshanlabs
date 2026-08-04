@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWARNAKARSHAN LABS PVT LTD</title>
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <style>
+        @layer utilities {
+            .kosh-k {
+                transform: perspective(100px) rotateY(-5deg);
+            }
+        }
+
+        /* WebGL Canvas */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* Thermal Blur Overlay Canvas */
+        #thermal-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            mix-blend-mode: screen;
+        }
+
+        #thermal-canvas.active {
+            opacity: 0.8;
+        }
+
+        header {
+            position: relative;
+            z-index: 2;
+            transition: filter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: filter;
+        }
+
+        /* Apply chromatic aberration blur to header content */
+        header.thermal-active {
+            filter: blur(10px) contrast(1.3) brightness(1.15) saturate(1.2);
+            -webkit-filter: blur(10px) contrast(1.3) brightness(1.15) saturate(1.2);
+        }
+
+        /* Yellow/Orange/Red chromatic aberration effect on text */
+        header.thermal-active h1,
+        header.thermal-active [data-reveal="text"] {
+            text-shadow: 
+                4px 0 0 rgba(255, 240, 0, 0.9),
+                -4px 0 0 rgba(255, 100, 0, 0.9),
+                0 4px 0 rgba(255, 200, 50, 0.8),
+                0 -4px 0 rgba(255, 150, 30, 0.8),
+                3px 3px 0 rgba(255, 220, 40, 0.7),
+                -3px -3px 0 rgba(255, 80, 20, 0.7),
+                2px 0 0 rgba(255, 255, 100, 0.6),
+                -2px 0 0 rgba(255, 60, 10, 0.6);
+            filter: blur(1.5px);
+            color: rgba(255, 200, 50, 1);
+        }
+
+        /* Yellow/Orange/Red chromatic aberration on logo */
+        header.thermal-active #logo-container {
+            filter: blur(3px) 
+                    drop-shadow(4px 0 0 rgba(255, 240, 0, 0.9)) 
+                    drop-shadow(-4px 0 0 rgba(255, 100, 0, 0.9))
+                    drop-shadow(0 4px 0 rgba(255, 200, 50, 0.8))
+                    drop-shadow(0 -4px 0 rgba(255, 150, 30, 0.8));
+        }
+
+        /* Text Animations - GSAP will handle these */
+        .text-reveal {
+            opacity: 1;
+        }
+
+        .text-reveal-line {
+            overflow: hidden;
+        }
+
+        .text-reveal-line-inner {
+            display: inline-block;
+        }
+
+        /* Ensure body is scrollable */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        /* Custom Font */
+        body {
+            font-family: "Noto Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-variation-settings: "wdth" 100;
+        }
+
+        /* Infinite Loop Footer */
+        .infinite-footer {
+            position: relative;
+            width: 100%;
+            /* background: #000;
+            color: #fff; */
+            padding: 40px 0;
+            overflow: hidden;
+        }
+
+        .infinite-footer-content {
+            display: flex;
+            white-space: nowrap;
+            will-change: transform;
+        }
+
+        .infinite-footer-text {
+            display: inline-block;
+            font-size: clamp(6.25rem, 4.5rem + 8.75vw, 15rem);
+            font-weight: 800;
+            letter-spacing: 2px;
+            padding: 0 50px;
+            line-height: 1;
+        }
+
+        .footer-info {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 80px;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .footer-contact {
+            /* font-size: 14px; */
+            font-weight: 400;
+        }
+
+        .footer-contact a {
+            color: #000;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-contact a:hover {
+            opacity: 0.7;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            /* font-size: 14px; */
+            font-weight: 400;
+        }
+        .koosh_logo{
+            width: clamp(18.75rem, 16.25rem + 12.5vw, 31.25rem);
+        }
+
+        .footer-links a {
+            color: #000;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+          .infinite-footer-content{
+            margin-bottom: 60px;
+          }
+          .infinite-footer{
+            margin-bottom: 20px;
+          }
+            .footer-info {
+                flex-direction: column-reverse;
+                gap: 15px;
+                align-items: flex-end;
+                padding: 0 20px;
+            }
+
+            .footer-contact,
+            .footer-links {
+                font-size: 12px;
+            }
+        }
+
+        /* @media (min-width: 768px) {
+            .infinite-footer-text {
+                font-size: 150px;
+            }
+        } */
+
+        /* Modern Hero Reveal Animations */
+        .hero-mask {
+            overflow: hidden;
+        }
+
+        .hero-text-mask {
+            overflow: hidden;
+            display: inline-block;
+        }
+
+    </style>
+</head>
+<body class="bg-white text-black font-sans overflow-x-hidden">
+    <!-- WebGL Canvas -->
+    <canvas id="webgl-canvas"></canvas>
+    <!-- Thermal Blur Canvas -->
+    <canvas id="thermal-canvas"></canvas>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- SWARNAKARSHAN LABS Logo and Name -->
+        <header class="min-h-screen flex flex-col justify-center items-center text-center py-20 px-10 md:py-20 md:px-10">
+            <div class="flex justify-center mb-5 text-reveal" data-reveal="logo" id="logo-container">
+                <div class="w-40 h-40 md:w-60 md:h-60 bg-black flex items-center justify-center">
+                    <div class="w-20 md:w-40 h-20 md:h-40 bg-white rounded-full"></div>
+                </div>
+            </div>
+            <!-- <div class="custom-cursor" id="custom-cursor"></div> -->
+            <h1 class="text-2xl md:text-2xl font-bold tracking-wider uppercase leading-snug text-reveal" data-reveal="text">
+                <span class="text-reveal-line"><span class="text-reveal-line-inner">SWARNAKARSHAN</span></span><br>
+                <span class="text-reveal-line"><span class="text-reveal-line-inner">LABS PVT LTD</span></span>
+            </h1>
+        </header>
+
+        <!-- Incubation Lab Section -->
+        <section class="incubation-section min-h-screen pt-20 pb-40 flex flex-col justify-center items-center py-20 px-10 md:py-20 md:px-10 md:pb-60">
+            <div class="flex flex-col md:flex-row gap-20 items-start justify-center max-w-5xl mx-auto w-full">
+                <div class="flex-1 text-2xl md:text-3xl font-bold leading-snug md:leading-snug text-left w-full md:text-right">
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">Incubation lab</span></p>
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">using technology to</span></p>
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">turn fragmented</span></p>
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">ecosystems into</span></p>
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">networks that</span></p>
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">compound globally.</span></p>
+                </div>
+                <div class="flex-1 w-full text-base leading-relaxed  relative md:pl-5 ">
+                    <div class="w-6 h-6 bg-black rounded-full mt-[10px]"></div>
+                    <div class="mt-[10%]">
+                        <p class="text-left text-xl md:text-2xl text-reveal-line">
+                            <span class="text-reveal-line-inner text-reveal">Bharat-built and AI-led,</span></p>
+                            <p class="text-left text-xl md:text-2xl text-reveal-line"><span class="text-reveal-line-inner text-reveal">SLPL prototypes and scales</span></p>           
+                            <p class="text-left text-xl md:text-2xl text-reveal-line"><span class="text-reveal-line-inner text-reveal">products that make value flow </span></p>
+                            <p class="text-left text-xl md:text-2xl text-reveal-line mb-4"><span class="text-reveal-line-inner text-reveal">cleaner, faster, and fairer.</span>
+                        </p>
+                        
+                            <p class=" text-left text-xl md:text-2xl text-reveal-line"><span class="text-reveal-line-inner text-reveal">We focus on long-horizon </span></p>
+                            <p class=" text-left text-xl md:text-2xl text-reveal-line"><span class="text-reveal-line-inner text-reveal">problems, ownership, trust, </span></p>
+                            <p class=" text-left text-xl md:text-2xl text-reveal-line"><span class="text-reveal-line-inner text-reveal">continuity, then graduate ventures </span></p>
+                            <p class=" text-left text-xl md:text-2xl text-reveal-line"><span class="text-reveal-line-inner text-reveal">once the network shows real </span></p>
+                            <p class="text-left text-xl md:text-2xl text-reveal-line"><span class="text-reveal-line-inner text-reveal"> compounding.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+         
+       
+
+        <!-- KOSH Section -->
+        <section class="kosh-section min-h-screen pt-40 pb-60 flex flex-col justify-center items-center text-left md:text-center py-20 px-10 md:py-20 md:px-10 md:pb-80">
+            <p class="text-reveal-line text-3xl mb-10 w-full font-bold text-left md:text-center"><span class="text-reveal-line-inner text-reveal">LAUNCHING SOON</span></p>
+            <div class="text-6xl w-full md:text-7xl font-bold tracking-wider mb-5 text-reveal-line">
+                <span class="text-reveal-line-inner text-reveal">
+                    <img src="./kkosh.png" class="koosh_logo" alt="kkosh logo">
+                </span>
+            </div>
+            <p class="text-lg w-full mb-10 font-normal tracking-wide text-reveal-line">
+                <span class="text-reveal-line-inner text-reveal text-2xl md:text-3xl">Ownership vault for Consumer <br> Possession Journey</span>
+            </p>
+        </section>
+        <section class="kosh-section min-h-screen pt-40 pb-60 flex flex-col justify-center items-center text-left md:text-center py-20 px-10 md:py-20 md:px-10 md:pb-80">
+            
+            
+            <div class="flex flex-col md:flex-row gap-10 items-center justify-center max-w-5xl mx-auto w-full mt-10">
+                <div class="flex-1 text-2xl md:text-3xl font-bold leading-snug md:leading-snug text-left md:text-right">
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">A high-value possessions</span></p>
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">vault that unifies warranties,</span></p>
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">insurance, loans, and service</span></p>
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">into one clean, effortless</span></p>
+                    <p class="text-reveal-line"><span class="text-reveal-line-inner text-reveal">post-purchase flow.</span></p>
+                </div>
+                <div class="flex-1 text-base leading-relaxed relative md:pl-5 mt-[20%]">
+                    <p class="text-left text-xl md:text-2xl text-reveal-line"><span class="text-reveal-line-inner text-reveal">KKOSH organizes vehicles, </span></p>
+                    <p class="text-left text-xl md:text-2xl text-reveal-line"><span class="text-reveal-line-inner text-reveal">appliances, and policies into</span></p>
+                    <p class="text-left text-xl md:text-2xl text-reveal-line"><span class="text-reveal-line-inner text-reveal">simple, living cards nudging at the </span></p>
+                    <p class="text-left text-xl md:text-2xl text-reveal-line "><span class="text-reveal-line-inner text-reveal">right time and connecting to</span></p>
+                        <p class="text-left text-xl md:text-2xl text-reveal-line mb-4"><span class="text-reveal-line-inner text-reveal"> trusted partners when action is needed.</span>
+                    </p>
+                    <p class="text-left text-xl md:text-2xl text-reveal-line">
+                       <span class="text-reveal-line-inner text-reveal">From EMI and renewal to repair, </span></p>
+                    <p class="text-left text-xl md:text-2xl text-reveal-line">
+                       <span class="text-reveal-line-inner text-reveal">resale, and scrap, it turns chaos </span></p>
+                        <p class="text-left text-xl md:text-2xl text-reveal-line mb-4"><span class="text-reveal-line-inner text-reveal">into one smooth experience.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Infinite Loop Footer -->
+    <footer class="infinite-footer">
+        <div class="infinite-footer-content">
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+            <span class="infinite-footer-text">SWARNAKARSHAN LABS PVT LTD . KKOSH .</span>
+        </div>
+        <div class="footer-info">
+            <div class="footer-contact">
+                <!-- <a href="mailto:info@swarnakarshan.com">info@swarnakarshan.com</a> -->
+                <p>© 2026 SWARNAKARSHAN LABS PVT LTD. All rights reserved.</p>
+            </div>
+            <div class="footer-links">
+                <a href="privacy-policy">Privacy Policy</a>
+                <a href="terms-and-conditions">Terms & Conditions</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // GSAP Text Reveal Animations Only
+        document.addEventListener('DOMContentLoaded', function() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Configure ScrollTrigger for better mobile touch support
+            ScrollTrigger.config({
+                autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
+            });
+
+            // Function to get mobile-friendly start position
+            function getStartPosition() {
+                const isMobile = window.innerWidth < 768;
+                // On mobile, trigger when element enters viewport
+                return isMobile ? 'top 95%' : 'top 85%';
+            }
+            
+            // Create a master timeline to ensure proper sequencing
+            const masterTimeline = gsap.timeline();
+
+            // Set initial states for hero animations only
+            gsap.set('[data-reveal="logo"]', { 
+                opacity: 0, 
+                scale: 0.5,
+                rotation: -180,
+                filter: 'blur(20px)'
+            });
+            
+            // Set initial states for header text only (hero section)
+            gsap.set('[data-reveal="text"] .text-reveal-line-inner', { 
+                y: 100, 
+                opacity: 0,
+                filter: 'blur(10px)'
+            });
+            gsap.set('[data-reveal="text"] .text-reveal-line', {
+                clipPath: 'inset(0 100% 0 0)'
+            });
+            
+            // Set initial states for ALL other text-reveal-line-inner elements (for scroll animations)
+            gsap.set('.text-reveal-line-inner:not([data-reveal="text"] .text-reveal-line-inner)', { 
+                y: 100, 
+                opacity: 0
+            });
+
+            // Modern Logo Animation - Play immediately on page load
+            const logoTimeline = gsap.timeline({
+                delay: 0.3
+            });
+
+            logoTimeline
+                .to('[data-reveal="logo"]', {
+                    opacity: 1,
+                    scale: 1,
+                    rotation: 0,
+                    filter: 'blur(0px)',
+                    duration: 1.5,
+                    ease: 'power4.out'
+                })
+                .to('[data-reveal="logo"]', {
+                    scale: 1.05,
+                    duration: 0.3,
+                    ease: 'power2.inOut',
+                    yoyo: true,
+                    repeat: 1
+                }, '-=0.5');
+
+            // Modern Header Text Animation - Play immediately after logo
+            const headerLines = gsap.utils.toArray('[data-reveal="text"] .text-reveal-line-inner');
+            const headerLineContainers = gsap.utils.toArray('[data-reveal="text"] .text-reveal-line');
+            
+            if (headerLines.length > 0) {
+                // Animate clip-path for each line container
+                headerLineContainers.forEach((container, i) => {
+                    gsap.to(container, {
+                        clipPath: 'inset(0 0% 0 0)',
+                        duration: 1.2,
+                        ease: 'power3.out',
+                        delay: 0.8 + (i * 0.15)
+                    });
+                });
+
+                // Animate text with blur and position
+                gsap.to(headerLines, {
+                    y: 0,
+                    opacity: 1,
+                    filter: 'blur(0px)',
+                    duration: 1.2,
+                    ease: 'power3.out',
+                    stagger: {
+                        amount: 0.6,
+                        from: 'start'
+                    },
+                    delay: 0.8
+                });
+            }
+
+            // Incubation section - lines reveal one by one when section comes into view
+            const incubationSection = document.querySelector('.incubation-section');
+            const incubationLines = gsap.utils.toArray('.incubation-section .text-reveal-line-inner');
+            
+            if (incubationLines.length > 0 && incubationSection) {
+                incubationLines.forEach((line, index) => {
+                    gsap.to(line, {
+                        y: 0,
+                        opacity: 1,
+                        duration: 1,
+                        ease: 'power3.out',
+                        delay: index * 0.1,
+                        scrollTrigger: {
+                            trigger: incubationSection,
+                            start: getStartPosition(),
+                            end: 'bottom top',
+                            once: true,
+                            invalidateOnRefresh: true,
+                            refreshPriority: 1,
+                            onEnter: () => {
+                                // Force animation if ScrollTrigger fires
+                                gsap.to(line, {
+                                    y: 0,
+                                    opacity: 1,
+                                    duration: 1,
+                                    ease: 'power3.out',
+                                    delay: index * 0.1,
+                                    overwrite: true
+                                });
+                            }
+                        }
+                    });
+                });
+            }
+
+
+            // Launching Soon section - line reveal
+            const launchingLine = document.querySelector('.kosh-section .text-reveal-line-inner');
+            if (launchingLine) {
+                gsap.to(launchingLine, {
+                    y: 0,
+                    opacity: 1,
+                    duration: 1,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: '.kosh-section',
+                        start: getStartPosition(),
+                        once: true,
+                        invalidateOnRefresh: true,
+                        refreshPriority: 1
+                    }
+                });
+            }
+
+            // KOSH section - lines reveal one by one when section comes into view
+            const koshSection = document.querySelector('.kosh-section');
+            const koshLines = gsap.utils.toArray('.kosh-section .text-reveal-line-inner');
+            
+            if (koshLines.length > 0 && koshSection) {
+                koshLines.forEach((line, index) => {
+                    gsap.to(line, {
+                        y: 0,
+                        opacity: 1,
+                        duration: 1,
+                        ease: 'power3.out',
+                        delay: index * 0.1,
+                        scrollTrigger: {
+                            trigger: koshSection,
+                            start: getStartPosition(),
+                            end: 'bottom top',
+                            once: true,
+                            invalidateOnRefresh: true,
+                            refreshPriority: 1,
+                            onEnter: () => {
+                                // Force animation if ScrollTrigger fires
+                                gsap.to(line, {
+                                    y: 0,
+                                    opacity: 1,
+                                    duration: 1,
+                                    ease: 'power3.out',
+                                    delay: index * 0.1,
+                                    overwrite: true
+                                });
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Infinite Loop Footer Animation
+            const footerContent = document.querySelector('.infinite-footer-content');
+            if (footerContent) {
+                const firstText = footerContent.querySelector('.infinite-footer-text');
+                if (firstText) {
+                    // Get the width of one text element
+                    const textWidth = firstText.offsetWidth + 100; // 100px for padding
+                    
+                    // Create seamless infinite loop
+                    gsap.set(footerContent, { x: 0 });
+                    
+                    gsap.to(footerContent, {
+                        x: -textWidth,
+                        duration: 30,
+                        ease: 'none',
+                        repeat: -1
+                    });
+                }
+            }
+
+            // Refresh ScrollTrigger on window resize for mobile
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    ScrollTrigger.refresh();
+                }, 250);
+            });
+
+            // Force ScrollTrigger to update on touch scroll for mobile
+            let touchScrollTimer;
+            window.addEventListener('touchmove', function() {
+                clearTimeout(touchScrollTimer);
+                touchScrollTimer = setTimeout(function() {
+                    ScrollTrigger.update();
+                }, 100);
+            }, { passive: true });
+
+            // Also update on scroll for better mobile support
+            window.addEventListener('scroll', function() {
+                ScrollTrigger.update();
+            }, { passive: true });
+
+            // Initial refresh after a short delay to ensure everything is loaded
+            setTimeout(function() {
+                ScrollTrigger.refresh();
+            }, 500);
+            
+            // Enhanced scroll handler to manually trigger animations
+            let lastScrollTop = 0;
+            function checkAndAnimate() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                // Check incubation section
+                const incubationSection = document.querySelector('.incubation-section');
+                if (incubationSection) {
+                    const rect = incubationSection.getBoundingClientRect();
+                    const isVisible = rect.top < window.innerHeight * 0.9 && rect.bottom > 0;
+                    const incubationLines = gsap.utils.toArray('.incubation-section .text-reveal-line-inner');
+                    
+                    if (isVisible && incubationLines.length > 0) {
+                        incubationLines.forEach((line, index) => {
+                            const currentOpacity = gsap.getProperty(line, 'opacity');
+                            if (currentOpacity === 0 || currentOpacity < 0.1) {
+                                gsap.to(line, {
+                                    y: 0,
+                                    opacity: 1,
+                                    duration: 1,
+                                    ease: 'power3.out',
+                                    delay: index * 0.1,
+                                    overwrite: true
+                                });
+                            }
+                        });
+                    }
+                }
+                
+                // Check KOSH section
+                const koshSection = document.querySelector('.kosh-section');
+                if (koshSection) {
+                    const rect = koshSection.getBoundingClientRect();
+                    const isVisible = rect.top < window.innerHeight * 0.9 && rect.bottom > 0;
+                    const koshLines = gsap.utils.toArray('.kosh-section .text-reveal-line-inner');
+                    
+                    if (isVisible && koshLines.length > 0) {
+                        koshLines.forEach((line, index) => {
+                            const currentOpacity = gsap.getProperty(line, 'opacity');
+                            if (currentOpacity === 0 || currentOpacity < 0.1) {
+                                gsap.to(line, {
+                                    y: 0,
+                                    opacity: 1,
+                                    duration: 1,
+                                    ease: 'power3.out',
+                                    delay: index * 0.1,
+                                    overwrite: true
+                                });
+                            }
+                        });
+                    }
+                }
+                
+                lastScrollTop = scrollTop;
+            }
+            
+            // Check on scroll
+            window.addEventListener('scroll', function() {
+                ScrollTrigger.update();
+                checkAndAnimate();
+            }, { passive: true });
+            
+            // Check on touch move
+            window.addEventListener('touchmove', function() {
+                ScrollTrigger.update();
+                checkAndAnimate();
+            }, { passive: true });
+            
+            // Initial check
+            setTimeout(checkAndAnimate, 1000);
+
+        });
+
+        // WebGL Particle Effect (not using GSAP)
+        const canvas = document.getElementById('webgl-canvas');
+        if (canvas && typeof THREE !== 'undefined') {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Create particles
+            const particleCount = 100;
+            const particles = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 20;
+            }
+
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const particleMaterial = new THREE.PointsMaterial({
+                color: 0x000000,
+                size: 0.05,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            const particleSystem = new THREE.Points(particles, particleMaterial);
+            scene.add(particleSystem);
+
+            camera.position.z = 5;
+
+            // Animate particles
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particleSystem.rotation.x += 0.001;
+                particleSystem.rotation.y += 0.001;
+                
+                const positions = particleSystem.geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i + 1] += Math.sin(Date.now() * 0.001 + i) * 0.0001;
+                }
+                particleSystem.geometry.attributes.position.needsUpdate = true;
+                
+                renderer.render(scene, camera);
+            }
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            animate();
+        }
+
+        // Thermal Blur Effect using WebGL on Mouse Move
+        const thermalCanvas = document.getElementById('thermal-canvas');
+        const header = document.querySelector('header');
+        
+        if (thermalCanvas && typeof THREE !== 'undefined' && header) {
+            const thermalScene = new THREE.Scene();
+            const thermalCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+            const thermalRenderer = new THREE.WebGLRenderer({ 
+                canvas: thermalCanvas, 
+                alpha: true, 
+                antialias: true 
+            });
+            
+            thermalRenderer.setSize(window.innerWidth, window.innerHeight);
+            thermalRenderer.setPixelRatio(window.devicePixelRatio);
+
+            // Thermal blur shader
+            const thermalShader = {
+                uniforms: {
+                    u_time: { value: 0 },
+                    u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
+                    u_intensity: { value: 0.0 },
+                    u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+                    void main() {
+                        vUv = uv;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float u_time;
+                    uniform vec2 u_mouse;
+                    uniform float u_intensity;
+                    uniform vec2 u_resolution;
+                    varying vec2 vUv;
+
+                    void main() {
+                        vec2 uv = vUv;
+                        vec2 mousePos = u_mouse;
+                        
+                        // Calculate direction and distance from mouse
+                        vec2 dir = uv - mousePos;
+                        float dist = length(dir);
+                        vec2 normalizedDir = normalize(dir);
+                        
+                        // Create radial falloff (stronger near mouse, fades out)
+                        float radialFalloff = 1.0 - smoothstep(0.0, 0.5, dist);
+                        
+                        // Create animated wave for thermal distortion
+                        float wave1 = sin(u_time * 2.5 + dist * 18.0);
+                        float wave2 = cos(u_time * 1.8 + dist * 14.0);
+                        float thermalWave = (wave1 + wave2) * 0.5;
+                        
+                        // Chromatic aberration amount (RGB channel separation)
+                        float aberrationStrength = u_intensity * radialFalloff * 0.04;
+                        
+                        // Direction-based chromatic aberration
+                        // Red channel shifts one way, Blue shifts opposite
+                        vec2 redShift = normalizedDir * aberrationStrength * (1.2 + thermalWave * 0.3);
+                        vec2 blueShift = normalizedDir * aberrationStrength * (-1.0 - thermalWave * 0.2);
+                        
+                        // Calculate angle for color gradient
+                        float angle = atan(dir.y, dir.x);
+                        float normalizedAngle = (angle + 3.14159) / (2.0 * 3.14159);
+                        
+                        // Yellow/Orange/Red color gradient (thermal colors)
+                        vec3 yellow = vec3(1.0, 1.0, 0.3);
+                        vec3 orange = vec3(1.0, 0.6, 0.1);
+                        vec3 red = vec3(1.0, 0.2, 0.1);
+                        
+                        // Mix colors based on distance and wave
+                        float colorMix1 = smoothstep(0.0, 0.3, dist);
+                        float colorMix2 = smoothstep(0.3, 0.6, dist);
+                        
+                        vec3 baseColor;
+                        if (dist < 0.3) {
+                            baseColor = mix(yellow, orange, colorMix1 * 2.0);
+                        } else {
+                            baseColor = mix(orange, red, (colorMix2 - 0.3) / 0.3);
+                        }
+                        
+                        // Add wave variation for dynamic effect
+                        baseColor += thermalWave * vec3(0.2, 0.1, 0.0) * u_intensity;
+                        
+                        // Intensity with wave animation
+                        float intensity = u_intensity * radialFalloff * (0.9 + thermalWave * 0.1);
+                        
+                        // Final color - yellow/orange/red thermal effect
+                        vec3 finalColor = baseColor * intensity;
+                        float alpha = intensity * 0.9;
+                        
+                        gl_FragColor = vec4(finalColor, alpha);
+                    }
+                `
+            };
+
+            const thermalMaterial = new THREE.ShaderMaterial(thermalShader);
+            const thermalGeometry = new THREE.PlaneGeometry(2, 2);
+            const thermalMesh = new THREE.Mesh(thermalGeometry, thermalMaterial);
+            thermalScene.add(thermalMesh);
+
+            let mouseX = 0.5;
+            let mouseY = 0.5;
+            let intensity = 0.0;
+            let targetIntensity = 0.0;
+            let isInHeader = false;
+            let lastMouseX = 0;
+            let lastMouseY = 0;
+            let mouseMoveTimeout = null;
+            let isMouseMoving = false;
+
+            // Mouse move handler - triggers on movement
+            function handleMouseMove(e) {
+                const rect = header.getBoundingClientRect();
+                const headerTop = rect.top;
+                const headerBottom = rect.bottom;
+                const headerLeft = rect.left;
+                const headerRight = rect.right;
+                
+                const mouseYPos = e.clientY;
+                const mouseXPos = e.clientX;
+                
+                // Calculate mouse movement speed
+                const deltaX = Math.abs(mouseXPos - lastMouseX);
+                const deltaY = Math.abs(mouseYPos - lastMouseY);
+                const movementSpeed = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                // Check if mouse is over header
+                if (mouseYPos >= headerTop && mouseYPos <= headerBottom && 
+                    mouseXPos >= headerLeft && mouseXPos <= headerRight) {
+                    isInHeader = true;
+                    
+                    // If mouse is moving, increase intensity based on speed
+                    if (movementSpeed > 0.5) {
+                        isMouseMoving = true;
+                        targetIntensity = Math.min(1.0, movementSpeed / 50.0);
+                        
+                        // Clear any existing timeout
+                        if (mouseMoveTimeout) {
+                            clearTimeout(mouseMoveTimeout);
+                        }
+                        
+                        // Set timeout to reset intensity when mouse stops
+                        mouseMoveTimeout = setTimeout(() => {
+                            isMouseMoving = false;
+                            targetIntensity = 0.0;
+                        }, 150);
+                    }
+                    
+                    // Normalize mouse position to 0-1 range
+                    mouseX = mouseXPos / window.innerWidth;
+                    mouseY = 1.0 - (mouseYPos / window.innerHeight); // Flip Y for WebGL
+                } else {
+                    isInHeader = false;
+                    targetIntensity = 0.0;
+                    isMouseMoving = false;
+                }
+                
+                lastMouseX = mouseXPos;
+                lastMouseY = mouseYPos;
+            }
+
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('touchmove', function(e) {
+                if (e.touches.length > 0) {
+                    handleMouseMove({
+                        clientX: e.touches[0].clientX,
+                        clientY: e.touches[0].clientY
+                    });
+                }
+            });
+
+            // Animate thermal effect
+            function animateThermal() {
+                requestAnimationFrame(animateThermal);
+                
+                // Smoothly interpolate intensity (faster when increasing, slower when decreasing)
+                if (targetIntensity > intensity) {
+                    intensity += (targetIntensity - intensity) * 0.15; // Faster increase
+                } else {
+                    intensity += (targetIntensity - intensity) * 0.08; // Slower decrease
+                }
+                
+                // Update shader uniforms
+                thermalMaterial.uniforms.u_time.value += 0.016;
+                thermalMaterial.uniforms.u_mouse.value.set(mouseX, mouseY);
+                thermalMaterial.uniforms.u_intensity.value = intensity;
+                
+                // Show/hide canvas based on intensity
+                if (intensity > 0.01) {
+                    thermalCanvas.classList.add('active');
+                    header.classList.add('thermal-active');
+                } else {
+                    thermalCanvas.classList.remove('active');
+                    header.classList.remove('thermal-active');
+                }
+                
+                thermalRenderer.render(thermalScene, thermalCamera);
+            }
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                thermalRenderer.setSize(window.innerWidth, window.innerHeight);
+                thermalMaterial.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+            });
+
+            animateThermal();
+        }
+    </script>
+</body>
+</html>
+

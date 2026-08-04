@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Swarnakarshan Labs Pvt Ltd | Building Networked Digital Ecosystems | KKOSH</title>
+    <meta name="description" content="Swarnakarshan Labs is a technology incubation lab building intelligent platforms like KKOSH to transform fragmented ecosystems into scalable, compounding digital networks globally." />
+    <meta name="keywords" content="Swarnakarshan Labs, KKOSH, technology incubation, digital ecosystems, networked platforms, digital transformation" />
+    <meta name="author" content="Swarnakarshan Labs Pvt Ltd" />
+    <meta name="image" content="./favicon.png" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Swarnakarshan Labs Pvt Ltd | Building Networked Digital Ecosystems | KKOSH" />
+    <meta property="og:description" content="Swarnakarshan Labs is a technology incubation lab building intelligent platforms like KKOSH to transform fragmented ecosystems into scalable, compounding digital networks globally." />
+    <meta property="og:image" content="./favicon.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Swarnakarshan Labs Pvt Ltd | Building Networked Digital Ecosystems | KKOSH" />
+    <meta name="twitter:description" content="Swarnakarshan Labs is a technology incubation lab building intelligent platforms like KKOSH to transform fragmented ecosystems into scalable, compounding digital networks globally." />
+    <meta name="twitter:image" content="./favicon.png" />
+    
+    <link rel="icon" type="image/png" media="(prefers-color-scheme: light)" href="./favicon-dark.jpeg" />
+    <link rel="icon" type="image/png" media="(prefers-color-scheme: dark)" href="./favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <style>
+      @layer utilities {
+        .kosh-k {
+          transform: perspective(100px) rotateY(-5deg);
+        }
+      }
+
+      /* WebGL Canvas */
+      #webgl-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.3;
+        pointer-events: none;
+        transition: opacity 0.8s ease;
+      }
+
+      body.inverted #webgl-canvas {
+        opacity: 0.5;
+      }
+
+      /* Text Animations - GSAP will handle these */
+      .text-reveal {
+        opacity: 1;
+      }
+
+      .text-reveal-line {
+        overflow: hidden;
+      }
+
+      .text-reveal-line-inner {
+        display: inline-block;
+      }
+
+      /* Ensure body is scrollable */
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Swiper Full Page Styles */
+      .swiper {
+        width: 100%;
+        height: 100vh;
+        position: relative;
+      }
+
+      .swiper-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        height: 100vh;
+      }
+
+      .swiper-slide-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Ensure sections take full height within slides */
+      .swiper-slide header,
+      .swiper-slide section {
+        width: 100%;
+      }
+
+      /* Custom Font */
+      body {
+        font-family: "Noto Sans", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+        font-variation-settings: "wdth" 100;
+        transition: background-color 0.8s ease, color 0.8s ease;
+      }
+
+      /* Body Inversion Styles */
+      body.inverted {
+        background-color: #000;
+        color: #fff;
+      }
+
+      body.inverted .footer-contact p,
+      body.inverted .footer-contact a,
+      body.inverted .footer-links a {
+        color: #fff;
+      }
+
+      body.inverted .infinite-footer-text {
+        color: #fff;
+      }
+
+      /* Infinite Loop Footer */
+      .infinite-footer {
+        position: relative;
+        width: 100%;
+        /* background: #000;
+            color: #fff; */
+        padding: 40px 0;
+        overflow: hidden;
+      }
+
+      .infinite-footer-content {
+        display: flex;
+        white-space: nowrap;
+        will-change: transform;
+      }
+
+      .infinite-footer-text {
+        display: inline-block;
+        font-size: clamp(6.25rem, 4.5rem + 8.75vw, 15rem);
+        font-weight: 800;
+        letter-spacing: 2px;
+        padding: 0 50px;
+        line-height: 1;
+        transition: color 0.8s ease;
+      }
+
+      .footer-info {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 80px;
+        z-index: 10;
+        pointer-events: auto;
+      }
+
+      .footer-contact {
+        /* font-size: 14px; */
+        font-weight: 400;
+      }
+
+      .footer-contact a {
+        color: #000;
+        text-decoration: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .footer-contact a:hover {
+        opacity: 0.7;
+      }
+
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 20px;
+        /* font-size: 14px; */
+        font-weight: 400;
+      }
+      .koosh_logo {
+        width: clamp(18.75rem, 16.25rem + 12.5vw, 31.25rem);
+        filter: invert(1);
+      }
+
+      .footer-links a {
+        color: #000;
+        text-decoration: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .footer-links a:hover {
+        opacity: 0.7;
+      }
+
+      @media (max-width: 1280px) {
+        .footer-links {
+          gap: 15px;
+        }
+      }
+      @media (max-width: 768px) {
+        .infinite-footer-content {
+          margin-bottom: 60px;
+        }
+        .infinite-footer {
+          margin-bottom: 20px;
+        }
+        .footer-info {
+          position: relative;
+          flex-direction: column-reverse;
+          gap: 15px;
+          align-items: flex-end;
+          padding: 0 20px;
+        }
+        .footer-contact p{
+            text-align: end;
+        }
+        .footer-contact,
+        .footer-links {
+          font-size: 12px;
+        }
+      }
+
+      /* @media (min-width: 768px) {
+            .infinite-footer-text {
+                font-size: 150px;
+            }
+        } */
+
+      /* Modern Hero Reveal Animations */
+      .hero-mask {
+        overflow: hidden;
+      }
+
+       .hero-text-mask {
+         overflow: hidden;
+         display: inline-block;
+       }
+
+       /* Contact Form Modal Styles */
+       .contact-modal {
+         position: fixed;
+         bottom: 0;
+         left: 0;
+         width: 100%;
+         z-index: 9999;
+         opacity: 0;
+         pointer-events: none;
+         transition: opacity 0.3s ease;
+       }
+
+       .contact-modal.active {
+         opacity: 1;
+         pointer-events: all;
+       }
+
+       .modal-overlay {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background: rgba(0, 0, 0, 0.5);
+         backdrop-filter: blur(4px);
+         opacity: 0;
+         transition: opacity 0.3s ease;
+       }
+
+       .contact-modal.active .modal-overlay {
+         opacity: 1;
+       }
+
+       .modal-content {
+         position: fixed;
+         bottom: 0;
+         left: 50%;
+         transform: translateX(-50%) translateY(100%);
+         background: #fff;
+         border-radius: 24px 24px 0 0;
+         padding: 40px;
+         max-width: 600px;
+         width: 100%;
+         max-height: 85vh;
+         overflow-y: auto;
+         transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+         box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+       }
+
+       body.inverted .modal-content {
+         background: #1a1a1a;
+         color: #fff;
+       }
+
+       .contact-modal.active .modal-content {
+         transform: translateX(-50%) translateY(0);
+       }
+
+       .modal-header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         margin-bottom: 30px;
+         padding-bottom: 20px;
+         border-bottom: 1px solid #e5e5e5;
+       }
+
+       body.inverted .modal-header {
+         border-bottom-color: #333;
+       }
+
+       .modal-title {
+         font-size: 28px;
+         font-weight: 700;
+         margin: 0;
+       }
+
+       .close-button {
+         background: none;
+         border: none;
+         font-size: 32px;
+         cursor: pointer;
+         color: #666;
+         transition: color 0.2s ease;
+         padding: 0;
+         width: 40px;
+         height: 40px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 50%;
+       }
+
+       .close-button:hover {
+         color: #000;
+         background: #f0f0f0;
+       }
+
+       body.inverted .close-button {
+         color: #999;
+       }
+
+       body.inverted .close-button:hover {
+         color: #fff;
+         background: #333;
+       }
+
+       .form-group {
+         margin-bottom: 24px;
+       }
+
+       .form-label {
+         display: block;
+         margin-bottom: 8px;
+         font-weight: 500;
+         font-size: 14px;
+         color: #333;
+       }
+
+       body.inverted .form-label {
+         color: #ccc;
+       }
+
+       .form-input,
+       .form-select,
+       .form-textarea {
+         width: 100%;
+         padding: 14px 16px;
+         border: 2px solid #e5e5e5;
+         border-radius: 10px;
+         font-size: 16px;
+         font-family: inherit;
+         transition: all 0.3s ease;
+         background: #fff;
+         color: #000;
+       }
+
+       body.inverted .form-input,
+       body.inverted .form-select,
+       body.inverted .form-textarea {
+         background: #2a2a2a;
+         border-color: #444;
+         color: #fff;
+       }
+
+       .form-input:focus,
+       .form-select:focus,
+       .form-textarea:focus {
+         outline: none;
+         border-color: #000;
+         box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+       }
+
+       body.inverted .form-input:focus,
+       body.inverted .form-select:focus,
+       body.inverted .form-textarea:focus {
+         border-color: #fff;
+         box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+       }
+
+       .form-textarea {
+         resize: vertical;
+         min-height: 120px;
+       }
+
+       .form-submit {
+         width: 100%;
+         padding: 16px;
+         background: #000;
+         color: #fff;
+         border: none;
+         border-radius: 10px;
+         font-size: 16px;
+         font-weight: 600;
+         cursor: pointer;
+         transition: all 0.3s ease;
+         margin-top: 10px;
+       }
+
+       body.inverted .form-submit {
+         background: #fff;
+         color: #000;
+       }
+
+       .form-submit:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+       }
+
+       body.inverted .form-submit:hover {
+         box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+       }
+
+       .form-submit:active {
+         transform: translateY(0);
+       }
+
+       @media (max-width: 768px) {
+         .modal-content {
+           padding: 30px 20px;
+           width: 100%;
+           max-width: 100%;
+           border-radius: 24px 24px 0 0;
+         }
+
+         .modal-title {
+           font-size: 24px;
+         }
+       }
+
+       /* Smooth scrollbar for modal */
+       .modal-content::-webkit-scrollbar {
+         width: 8px;
+       }
+
+       .modal-content::-webkit-scrollbar-track {
+         background: transparent;
+       }
+
+       .modal-content::-webkit-scrollbar-thumb {
+         background: #ccc;
+         border-radius: 4px;
+       }
+
+       .modal-content::-webkit-scrollbar-thumb:hover {
+         background: #999;
+       }
+
+       body.inverted .modal-content::-webkit-scrollbar-thumb {
+         background: #555;
+       }
+
+       body.inverted .modal-content::-webkit-scrollbar-thumb:hover {
+         background: #777;
+       }
+     </style>
+  </head>
+  <body class="bg-white text-black font-sans overflow-x-hidden">
+    <!-- WebGL Canvas -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Swiper Container -->
+    <div class="swiper swiper-vertical" id="mainSwiper">
+      <div class="swiper-wrapper">
+        <!-- Slide 1: Hero Section -->
+        <div class="swiper-slide ">
+          <div class="swiper-slide-content">
+            <div
+              class="max-w-7xl mx-auto relative z-10 h-full flex items-center">
+              <header
+                class="w-full min-h-[100dvh] max-h-[100dvh] h-[100dvh] flex flex-col justify-center items-center text-center py-20 px-10 md:py-20 md:px-10">
+                <div
+                  class="flex justify-center mb-5 text-reveal"
+                  data-reveal="logo"
+                  id="logo-container">
+                  <div
+                    class="w-40 h-40 md:w-60 md:h-60 bg-black flex items-center justify-center">
+                    <div
+                      class="w-20 md:w-40 h-20 md:h-40 bg-white rounded-full"></div>
+                  </div>
+                </div>
+                <h1
+                  class="text-2xl md:text-2xl font-bold tracking-wider uppercase leading-snug text-reveal"
+                  data-reveal="text">
+                  <span class="text-reveal-line"
+                    ><span class="text-reveal-line-inner"
+                      >SWARNAKARSHAN</span
+                    ></span
+                  ><br />
+                  <span class="text-reveal-line"
+                    ><span class="text-reveal-line-inner"
+                      >LABS PVT LTD</span
+                    ></span
+                  >
+                </h1>
+              </header>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: Incubation Lab Section -->
+        <div class="swiper-slide ">
+          <div class="swiper-slide-content">
+            <div class="w-full mx-auto relative z-10 h-full flex items-center">
+              <section
+                class="incubation-section w-full min-h-[100dvh] max-h-[100dvh] h-[100dvh] flex flex-col justify-center items-center p-4 md:p-20  md:py-20 md:px-10 md:pb-20">
+                <div
+                  class="flex flex-col md:flex-row gap-20 items-start justify-center mx-auto w-full">
+                  <div
+                    class="flex-1 text-xl md:text-2xl md:text-3xl font-bold leading-snug md:leading-snug text-left w-full md:text-right">
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >Incubation lab</span
+                      >
+                    </p>
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >using technology to</span
+                      >
+                    </p>
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >turn fragmented</span
+                      >
+                    </p>
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >ecosystems into</span
+                      >
+                    </p>
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >networks that</span
+                      >
+                    </p>
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >compound globally.</span
+                      >
+                    </p>
+                  </div>
+                  <div
+                    class="flex-1 w-full text-base leading-relaxed relative md:pl-5">
+                    <div class="w-6 h-6 bg-black rounded-full mt-[10px]"></div>
+                    <div class="mt-[5%]">
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >Bharat-built and AI-led,</span
+                        >
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >SLPL prototypes and scales</span
+                        >
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >products that make value flow
+                        </span>
+                      </p>
+                      <p
+                        class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line mb-4">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >cleaner, faster, and fairer.</span
+                        >
+                      </p>
+
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >We focus on long-horizon
+                        </span>
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >problems, ownership, trust,
+                        </span>
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >continuity, then graduate ventures
+                        </span>
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >once the network shows real
+                        </span>
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal">
+                          compounding.</span
+                        >
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: KOSH Section - Launching Soon -->
+        <div class="swiper-slide ">
+          <div class="swiper-slide-content">
+            <div class="w-full mx-auto relative z-10 h-full flex items-center">
+              <section
+                class="kosh-section w-full min-h-[100dvh] max-h-[100dvh] h-[100dvh] flex flex-col justify-center items-center text-left md:text-center p-4 md:p-20 md:py-20 md:px-10 md:pb-20">
+                <p
+                  class="text-reveal-line text-xl sm:text-2xl md:text-3xl mb-10 w-full font-bold text-left md:text-center">
+                  <span class="text-reveal-line-inner text-reveal"
+                    >LAUNCHING SOON</span
+                  >
+                </p>
+                <div
+                  class="text-6xl w-full md:text-7xl font-bold tracking-wider mb-5 text-reveal-line">
+                  <span class="text-reveal-line-inner text-reveal">
+                    <img
+                      src="./kkosh.png"
+                      class="koosh_logo"
+                      alt="kkosh logo" />
+                  </span>
+                </div>
+                <p
+                  class="text-lg w-full mb-10 font-normal tracking-wide text-reveal-line">
+                  <span
+                    class="text-reveal-line-inner text-reveal text-lg sm:text-xl md:text-2xl md:text-3xl"
+                    >Ownership vault for Consumer <br />
+                    Possession Journey</span
+                  >
+                </p>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 4: KOSH Section - Details -->
+        <div class="swiper-slide h-[100dvh] max-h-[100dvh]">
+          <div class="swiper-slide-content">
+            <div class="w-full mx-auto relative z-10 h-full flex flex-col md:flex-row items-center justify-between">
+              <section
+                class="kosh-section w-full flex  flex-col justify-center items-center text-left md:text-center p-4 pt-16 md:pt-0 md:p-20 md:py-20 md:px-10 md:pb-20">
+                <div
+                  class="flex flex-col md:flex-row gap-5 sm:gap-10 items-start justify-center sm:mb-0 mx-auto w-full mt-0 sm:mt-10">
+                  <div
+                    class="flex-1 text-xl sm:text-2xl md:text-3xl font-bold leading-snug md:leading-snug text-left md:text-right">
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >A high-value possessions</span
+                      >
+                    </p>
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >vault that unifies warranties,</span
+                      >
+                    </p>
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >insurance, loans, and service</span
+                      >
+                    </p>
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >into one clean, effortless</span
+                      >
+                    </p>
+                    <p class="text-reveal-line">
+                      <span class="text-reveal-line-inner text-reveal"
+                        >post-purchase flow.</span
+                      >
+                    </p>
+                  </div>
+                  <div
+                    class="flex-1 w-full text-base leading-relaxed relative md:pl-5">
+                    <div
+                      class="w-6 h-6 bg-black rounded-full mt-[10px] hidden sm:block sm:opacity-0 "></div>
+                    <div class="mt-[5%]">
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >KKOSH organizes vehicles,
+                        </span>
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >appliances, and policies into</span
+                        >
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >simple, living cards nudging at the
+                        </span>
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >right time and connecting to</span
+                        >
+                      </p>
+                      <p
+                        class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line mb-4">
+                        <span class="text-reveal-line-inner text-reveal">
+                          trusted partners when action is needed.</span
+                        >
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >From EMI and renewal to repair,
+                        </span>
+                      </p>
+                      <p class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >resale, and scrap, it turns chaos
+                        </span>
+                      </p>
+                      <p
+                        class="text-left text-lg sm:text-xl md:text-2xl text-reveal-line mb-4">
+                        <span class="text-reveal-line-inner text-reveal"
+                          >into one smooth experience.</span
+                        >
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <div class="footer-info">
+                <div class="footer-contact">
+                  <!-- <a href="mailto:info@swarnakarshan.com">info@swarnakarshan.com</a> -->
+                  <p>
+                    © 2026 SWARNAKARSHAN LABS PVT LTD. All rights reserved.
+                  </p>
+                </div>
+                <div class="footer-links">
+                    <a href="mailto:anjali@swarnakarshanlabs.com"
+                    >anjali@swarnakarshanlabs.com</a
+                  >
+                  <a href="tel:+91-8588888264"> +91-8588888264</a>
+                  <a href="privacy-policy" target="_blank">Privacy Policy</a>
+                  <a href="terms-and-conditions" target="_blank">Terms & Conditions</a>
+				  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+		
+		
+
+        <!-- <div class="swiper-slide">
+          <div class="swiper-slide-content">
+            <footer
+              class="infinite-footer h-full flex flex-col justify-between">
+              <div class="footer-info top-0">
+                <div class="footer-contact">
+                  <p></p>
+                </div>
+                <div class="footer-links">
+                  <a href="mailto:anjali@swarnakarshanlabs.com"
+                    >anjali@swarnakarshanlabs.com</a
+                  >
+                  <a href="tel:+91-8588888264"> +91-8588888264</a>
+                  <button id="getInTouchBtn" class="text-white pl-4 cursor-pointer hover:underline">Get in touch</button>
+                </div>
+              </div>
+              <div>
+                <div class="infinite-footer-content">
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                  <span class="infinite-footer-text"
+                    >SWARNAKARSHAN LABS PVT LTD . KKOSH .</span
+                  >
+                </div>
+                <div class="footer-info">
+                  <div class="footer-contact">
+                    <a href="mailto:info@swarnakarshan.com">info@swarnakarshan.com</a>
+                    <p>
+                      © 2026 SWARNAKARSHAN LABS PVT LTD. All rights reserved.
+                    </p>
+                  </div>
+                  <div class="footer-links">
+                    <a href="privacy-policy" target="_blank">Privacy Policy</a>
+                    <a href="terms-and-conditions" target="_blank">Terms & Conditions</a>
+                  </div>
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div> -->
+      </div>
+    </div>
+
+    <script>
+      // Initialize Swiper and handle animations
+      document.addEventListener("DOMContentLoaded", function () {
+        // Function to animate section lines
+        function animateSectionLines(selectorOrElements, delay = 0) {
+          let lines;
+          if (typeof selectorOrElements === "string") {
+            lines = gsap.utils.toArray(selectorOrElements);
+          } else if (selectorOrElements && selectorOrElements.length) {
+            lines = Array.from(selectorOrElements);
+          } else {
+            lines = [];
+          }
+
+          if (lines.length > 0) {
+            lines.forEach((line, index) => {
+              const currentOpacity = gsap.getProperty(line, "opacity");
+              if (currentOpacity === 0 || currentOpacity < 0.1) {
+                gsap.to(line, {
+                  y: 0,
+                  opacity: 1,
+                  duration: 1,
+                  ease: "power3.out",
+                  delay: delay + index * 0.1,
+                  overwrite: true,
+                });
+              }
+            });
+          }
+        }
+
+        // Function to reset section lines
+        function resetSectionLines(selector) {
+          const lines = gsap.utils.toArray(selector);
+          lines.forEach((line) => {
+            gsap.set(line, {
+              y: 100,
+              opacity: 0,
+            });
+          });
+        }
+
+        const swiper = new Swiper("#mainSwiper", {
+          direction: "vertical",
+          slidesPerView: 1,
+          spaceBetween: 0,
+          mousewheel: {
+            enabled: true,
+            sensitivity: 1,
+            releaseOnEdges: false,
+          },
+          touchEventsTarget: "container",
+          speed: 800,
+          allowTouchMove: true,
+          resistance: true,
+          resistanceRatio: 0,
+          freeMode: false,
+          effect: "slide",
+          on: {
+            init: function () {
+              // Hero section (slide 0) animations are handled by GSAP on page load
+              // Animate other sections when they become active
+              const activeIndex = this.activeIndex;
+
+              // Set initial inversion state
+              if (activeIndex >= 2) {
+                document.body.classList.add("inverted");
+              } else {
+                document.body.classList.remove("inverted");
+              }
+
+              if (activeIndex === 1) {
+                setTimeout(() => {
+                  animateSectionLines(
+                    ".swiper-slide:nth-child(2) .incubation-section .text-reveal-line-inner"
+                  );
+                }, 500);
+              }
+            },
+            slideChange: function () {
+              const activeIndex = this.activeIndex;
+              const activeSlide = this.slides[activeIndex];
+
+              // Invert body after 2nd section (index >= 2)
+              if (activeIndex >= 2) {
+                document.body.classList.add("inverted");
+              } else {
+                document.body.classList.remove("inverted");
+              }
+
+              // Reset all sections first (except hero)
+              resetSectionLines(
+                '.text-reveal-line-inner:not([data-reveal="text"] .text-reveal-line-inner)'
+              );
+
+              // Animate based on active slide
+              setTimeout(() => {
+                if (activeIndex === 1) {
+                  // Incubation section
+                  animateSectionLines(
+                    activeSlide.querySelectorAll(
+                      ".incubation-section .text-reveal-line-inner"
+                    )
+                  );
+                } else if (activeIndex === 2) {
+                  // First KOSH section
+                  animateSectionLines(
+                    activeSlide.querySelectorAll(
+                      ".kosh-section .text-reveal-line-inner"
+                    )
+                  );
+                } else if (activeIndex === 3) {
+                  // Second KOSH section
+                  animateSectionLines(
+                    activeSlide.querySelectorAll(
+                      ".kosh-section .text-reveal-line-inner"
+                    )
+                  );
+                }
+              }, 300);
+            },
+          },
+        });
+
+        // Store swiper instance globally for use in other scripts
+        window.mainSwiper = swiper;
+      });
+    </script>
+
+    <script>
+      // GSAP Text Reveal Animations Only
+      document.addEventListener("DOMContentLoaded", function () {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Configure ScrollTrigger for better mobile touch support
+        ScrollTrigger.config({
+          autoRefreshEvents: "visibilitychange,DOMContentLoaded,load",
+        });
+
+        // Function to get mobile-friendly start position
+        function getStartPosition() {
+          const isMobile = window.innerWidth < 768;
+          // On mobile, trigger when element enters viewport
+          return isMobile ? "top 95%" : "top 85%";
+        }
+
+        // Create a master timeline to ensure proper sequencing
+        const masterTimeline = gsap.timeline();
+
+        // Set initial states for hero animations only
+        gsap.set('[data-reveal="logo"]', {
+          opacity: 0,
+          scale: 0.5,
+          rotation: -180,
+          filter: "blur(20px)",
+        });
+
+        // Set initial states for header text only (hero section)
+        gsap.set('[data-reveal="text"] .text-reveal-line-inner', {
+          y: 100,
+          opacity: 0,
+          filter: "blur(10px)",
+        });
+        gsap.set('[data-reveal="text"] .text-reveal-line', {
+          clipPath: "inset(0 100% 0 0)",
+        });
+
+        // Set initial states for ALL other text-reveal-line-inner elements (for scroll animations)
+        gsap.set(
+          '.text-reveal-line-inner:not([data-reveal="text"] .text-reveal-line-inner)',
+          {
+            y: 100,
+            opacity: 0,
+          }
+        );
+
+        // Modern Logo Animation - Play immediately on page load
+        const logoTimeline = gsap.timeline({
+          delay: 0.3,
+        });
+
+        logoTimeline
+          .to('[data-reveal="logo"]', {
+            opacity: 1,
+            scale: 1,
+            rotation: 0,
+            filter: "blur(0px)",
+            duration: 1.5,
+            ease: "power4.out",
+          })
+          .to(
+            '[data-reveal="logo"]',
+            {
+              scale: 1.05,
+              duration: 0.3,
+              ease: "power2.inOut",
+              yoyo: true,
+              repeat: 1,
+            },
+            "-=0.5"
+          );
+
+        // Modern Header Text Animation - Play immediately after logo
+        const headerLines = gsap.utils.toArray(
+          '[data-reveal="text"] .text-reveal-line-inner'
+        );
+        const headerLineContainers = gsap.utils.toArray(
+          '[data-reveal="text"] .text-reveal-line'
+        );
+
+        if (headerLines.length > 0) {
+          // Animate clip-path for each line container
+          headerLineContainers.forEach((container, i) => {
+            gsap.to(container, {
+              clipPath: "inset(0 0% 0 0)",
+              duration: 1.2,
+              ease: "power3.out",
+              delay: 0.8 + i * 0.15,
+            });
+          });
+
+          // Animate text with blur and position
+          gsap.to(headerLines, {
+            y: 0,
+            opacity: 1,
+            filter: "blur(0px)",
+            duration: 1.2,
+            ease: "power3.out",
+            stagger: {
+              amount: 0.6,
+              from: "start",
+            },
+            delay: 0.8,
+          });
+        }
+
+        // Incubation section - will be animated by Swiper slide change events
+        // Animation handled in Swiper initialization
+
+        // Launching Soon section - will be animated by Swiper slide change events
+        // Animation handled in Swiper initialization
+
+        // KOSH section - will be animated by Swiper slide change events
+        // Animation handled in Swiper initialization
+
+        // Infinite Loop Footer Animation
+        const footerContent = document.querySelector(
+          ".infinite-footer-content"
+        );
+        if (footerContent) {
+          const firstText = footerContent.querySelector(
+            ".infinite-footer-text"
+          );
+          if (firstText) {
+            // Get the width of one text element
+            const textWidth = firstText.offsetWidth + 100; // 100px for padding
+
+            // Create seamless infinite loop
+            gsap.set(footerContent, { x: 0 });
+
+            gsap.to(footerContent, {
+              x: -textWidth,
+              duration: 30,
+              ease: "none",
+              repeat: -1,
+            });
+          }
+        }
+
+        // Refresh ScrollTrigger on window resize for mobile
+        let resizeTimer;
+        window.addEventListener("resize", function () {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(function () {
+            ScrollTrigger.refresh();
+          }, 250);
+        });
+
+        // Force ScrollTrigger to update on touch scroll for mobile
+        let touchScrollTimer;
+        window.addEventListener(
+          "touchmove",
+          function () {
+            clearTimeout(touchScrollTimer);
+            touchScrollTimer = setTimeout(function () {
+              ScrollTrigger.update();
+            }, 100);
+          },
+          { passive: true }
+        );
+
+        // Also update on scroll for better mobile support
+        window.addEventListener(
+          "scroll",
+          function () {
+            ScrollTrigger.update();
+          },
+          { passive: true }
+        );
+
+        // Initial refresh after a short delay to ensure everything is loaded
+        setTimeout(function () {
+          ScrollTrigger.refresh();
+        }, 500);
+
+        // Scroll-based animations are now handled by Swiper slide change events
+      });
+
+      // WebGL Particle Effect (not using GSAP)
+      const canvas = document.getElementById("webgl-canvas");
+      if (canvas && typeof THREE !== "undefined") {
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        const renderer = new THREE.WebGLRenderer({
+          canvas: canvas,
+          alpha: true,
+          antialias: true,
+        });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        // Create particles
+        const particleCount = 150;
+        const particles = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i++) {
+          positions[i] = (Math.random() - 0.5) * 20;
+        }
+
+        particles.setAttribute(
+          "position",
+          new THREE.BufferAttribute(positions, 3)
+        );
+
+        const particleMaterial = new THREE.PointsMaterial({
+          color: 0x000000,
+          size: 0.05,
+          transparent: true,
+          opacity: 0.6,
+        });
+
+        const particleSystem = new THREE.Points(particles, particleMaterial);
+        scene.add(particleSystem);
+
+        camera.position.z = 5;
+
+        // Particle speed control with smooth interpolation
+        let speedMultiplier = 0.5;
+        let targetSpeed = 0.5;
+        const speedLerpFactor = 0.05; // Smoothness factor (lower = smoother, slower transition)
+
+        // Function to update particle color based on inverted state
+        function updateParticleColor() {
+          const isInverted = document.body.classList.contains("inverted");
+          if (isInverted) {
+            // White particles for black background - brighter and more visible
+            particleMaterial.color.setHex(0xffffff);
+          } else {
+            // Black particles for white background
+            particleMaterial.color.setHex(0x000000);
+          }
+          // Force material update
+          particleMaterial.needsUpdate = true;
+        }
+
+        // Watch for changes to body class
+        const observer = new MutationObserver(function (mutations) {
+          mutations.forEach(function (mutation) {
+            if (
+              mutation.type === "attributes" &&
+              mutation.attributeName === "class"
+            ) {
+              updateParticleColor();
+            }
+          });
+        });
+
+        // Start observing body for class changes
+        observer.observe(document.body, {
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+
+        // Set initial color
+        updateParticleColor();
+
+        // Speed control event listeners
+        let moveTimeout = null;
+
+        function increaseSpeed() {
+          targetSpeed = 3; // Target speed when moving
+        }
+
+        function resetSpeed() {
+          targetSpeed = 0.5; // Target normal speed
+        }
+
+        // Mouse move - increase speed when cursor moves
+        window.addEventListener("mousemove", function () {
+          increaseSpeed();
+          
+          // Clear any existing timeout
+          if (moveTimeout) {
+            clearTimeout(moveTimeout);
+          }
+          
+          // Reset to normal speed after cursor stops moving (500ms)
+          moveTimeout = setTimeout(function () {
+            resetSpeed();
+          }, 500);
+        });
+
+        // Mouse leave - reset speed when cursor leaves window
+        window.addEventListener("mouseleave", function () {
+          if (moveTimeout) {
+            clearTimeout(moveTimeout);
+          }
+          resetSpeed();
+        });
+
+        // Touch move for mobile
+        window.addEventListener("touchmove", function () {
+          increaseSpeed();
+          
+          if (moveTimeout) {
+            clearTimeout(moveTimeout);
+          }
+          
+          moveTimeout = setTimeout(function () {
+            resetSpeed();
+          }, 500);
+        });
+
+        // Animate particles
+        function animate() {
+          requestAnimationFrame(animate);
+
+          // Smoothly interpolate speed multiplier towards target speed
+          speedMultiplier += (targetSpeed - speedMultiplier) * speedLerpFactor;
+
+          // Apply speed multiplier to rotation
+          particleSystem.rotation.x += 0.001 * speedMultiplier;
+          particleSystem.rotation.y += 0.001 * speedMultiplier;
+
+          const positions = particleSystem.geometry.attributes.position.array;
+          const timeMultiplier = speedMultiplier;
+          for (let i = 0; i < positions.length; i += 3) {
+            positions[i + 1] +=
+              Math.sin(Date.now() * 0.001 * timeMultiplier + i) *
+              0.0001 *
+              timeMultiplier;
+          }
+          particleSystem.geometry.attributes.position.needsUpdate = true;
+
+          renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener("resize", () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+      }
+    </script>
+
+    <!-- Contact Form Modal -->
+    <div id="contactModal" class="contact-modal">
+      <div class="modal-overlay" id="modalOverlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Get in Touch</h2>
+          <button class="close-button" id="closeModal">&times;</button>
+        </div>
+        <form id="contactForm" class="contact-form">
+          <div class="form-group">
+            <label for="name" class="form-label">Name *</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="form-input"
+              placeholder="Enter your name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="email" class="form-label">Email *</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="phone" class="form-label">Phone Number *</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              class="form-input"
+              placeholder="Enter your phone number"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="enquiryType" class="form-label">Enquiry Type *</label>
+            <select
+              id="enquiryType"
+              name="enquiryType"
+              class="form-select"
+              required
+            >
+              <option value="">Select enquiry type</option>
+              <option value="general">General Inquiry</option>
+              <option value="partnership">Partnership</option>
+              <option value="support">Support</option>
+              <option value="media">Media Inquiry</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message" class="form-label">Message *</label>
+            <textarea
+              id="message"
+              name="message"
+              class="form-textarea"
+              placeholder="Enter your message"
+              required
+            ></textarea>
+          </div>
+          <button type="submit" class="form-submit">Send Message</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Contact Form Modal
+      document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById("contactModal");
+        const openBtn = document.getElementById("getInTouchBtn");
+        const closeBtn = document.getElementById("closeModal");
+        const overlay = document.getElementById("modalOverlay");
+        const form = document.getElementById("contactForm");
+
+        // Open modal with smooth animation from bottom
+        function openModal() {
+          if (openBtn) {
+            // Get button position
+            const buttonRect = openBtn.getBoundingClientRect();
+            const modalContent = document.querySelector(".modal-content");
+            
+            // Position modal near button (optional - can keep bottom aligned)
+            // For now, keeping it at bottom center for better UX
+          }
+          
+          modal.classList.add("active");
+          document.body.style.overflow = "hidden";
+          
+          // Animate form fields in with delay after modal slides up
+          setTimeout(() => {
+            const formFields = form.querySelectorAll(".form-group");
+            formFields.forEach((field, index) => {
+              gsap.fromTo(
+                field,
+                { opacity: 0, y: 10 },
+                {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.4,
+                  delay: index * 0.08,
+                  ease: "power2.out",
+                }
+              );
+            });
+          }, 200);
+        }
+
+        // Close modal with smooth animation
+        function closeModal() {
+          const formFields = form.querySelectorAll(".form-group");
+          gsap.to(formFields, {
+            opacity: 0,
+            y: 10,
+            duration: 0.2,
+            stagger: 0.03,
+            ease: "power2.in",
+          });
+          
+          setTimeout(() => {
+            modal.classList.remove("active");
+            document.body.style.overflow = "";
+            form.reset();
+          }, 300);
+        }
+
+        // Event listeners
+        if (openBtn) {
+          openBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            openModal();
+          });
+        }
+
+        if (closeBtn) {
+          closeBtn.addEventListener("click", closeModal);
+        }
+
+        if (overlay) {
+          overlay.addEventListener("click", closeModal);
+        }
+
+        // Close on Escape key
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && modal.classList.contains("active")) {
+            closeModal();
+          }
+        });
+
+        // Form submission
+        if (form) {
+          form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+              name: document.getElementById("name").value,
+              email: document.getElementById("email").value,
+              phone: document.getElementById("phone").value,
+              enquiryType: document.getElementById("enquiryType").value,
+              message: document.getElementById("message").value,
+            };
+
+            // Here you can add your form submission logic
+            // For example, send to an API endpoint
+            console.log("Form submitted:", formData);
+
+            // Show success message (you can customize this)
+            alert("Thank you! Your message has been sent. We'll get back to you soon.");
+            
+            // Close modal after submission
+            closeModal();
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
